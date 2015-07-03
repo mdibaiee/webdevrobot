@@ -69,7 +69,7 @@ export default function doc(bot) {
   };
 
   const ask = new Message().text('What subject are you searching for?');
-  bot.command('doc', function docCommand(message) {
+  bot.command('doc', message => {
     let subject = message.text.slice(4).trim();
 
     if (!subject) {
