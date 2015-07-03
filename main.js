@@ -66,3 +66,9 @@ bot.command('subscribe', message => {
 
   bot.send(success.to(message.chat.id));
 });
+
+const welcome = new Message().text(`Hello!
+  You can subscribe to /r/javascript using /subscribe command!`);
+bot.command('start', message => {
+  bot.send(welcome.to(message.chat.id));
+});
