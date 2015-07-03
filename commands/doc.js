@@ -73,7 +73,9 @@ export default function doc(bot) {
     let subject = message.text.slice(4).trim();
 
     if (!subject) {
-      bot.send(ask.to(message.chat.id)).then(docCommand);
+      bot.send(ask.to(message.chat.id)).then(answer => {
+        bot.send(getSubject(answer.text).to(message.chat.id));
+      });
     } else {
       bot.send(getSubject(subject).to(message.chat.id));
     }
