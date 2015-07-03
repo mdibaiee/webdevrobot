@@ -9,15 +9,25 @@ let bot = new Bot({
 
 bot.start();
 
-const welcome = new Message().text(`Hello!
-I give you services to search across various sources such as MDN, GitHub, etc.
-
-Commands:
+const COMMANDS = `Commands:
 /subscribe - Subscribe to /r/javascript and get a message for each new message
 /unsubscribe - Unsubscribe
-/doc [subject] - Search MDN for the given subject`);
+/doc [subject] - Search MDN for the given subject
+/github [subject] - Search GitHub for a repository
+/npm [subject] - Search NPM for a package`;
+
+const start = new Message().text(`Hello!
+I give you services to search across various sources such as MDN, GitHub, etc.
+
+${COMMANDS}`);
+
 bot.command('start', message => {
-  bot.send(welcome.to(message.chat.id));
+  bot.send(start.to(message.chat.id));
+});
+
+const help = new Message().text(COMMANDS);
+bot.command('help', message => {
+  bot.send(help.to(message.chat.id));
 });
 
 
