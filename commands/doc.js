@@ -69,14 +69,11 @@ export default function doc(bot) {
   };
 
   const ask = new Message().text('What subject are you searching for?');
-  bot.command('doc', message => {
+  bot.command('doc', function docCommand(message) {
     let subject = message.text.slice(4).trim();
 
     if (!subject) {
-      bot.send(ask.to(message.chat.id)).then(answer => {
-        subject = answer;
-        bot.send(getSubject(subject).to(message.chat.id));
-      });
+      bot.send(ask.to(message.chat.id)).then(docCommand);
     } else {
       bot.send(getSubject(subject).to(message.chat.id));
     }

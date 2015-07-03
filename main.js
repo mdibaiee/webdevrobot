@@ -10,9 +10,13 @@ let bot = new Bot({
 bot.start();
 
 const welcome = new Message().text(`Hello!
-  You can subscribe to /r/javascript using /subscribe command!`);
+I give you services to search across various sources such as MDN, GitHub, etc.
+
+Commands:
+/subscribe - Subscribe to /r/javascript and get a message for each new message
+/unsubscribe - Unsubscribe
+/doc [subject] - Search MDN for the given subject`);
 bot.command('start', message => {
-  console.log(message.chat.id);
   bot.send(welcome.to(message.chat.id));
 });
 
