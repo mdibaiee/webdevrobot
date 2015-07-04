@@ -36,7 +36,7 @@ export default function subscribe(bot) {
             parser.removeListener('data', listener);
 
             time = new Date();
-            write('time', {time});
+            write('time', {time: time + ''});
 
             resolve(posts);
             return;
