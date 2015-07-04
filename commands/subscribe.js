@@ -38,6 +38,7 @@ export default function subscribe(bot) {
             time = new Date();
             write('time', {time: time + ''});
 
+            console.log(posts);
             resolve(posts);
             return;
           }
