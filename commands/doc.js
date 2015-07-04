@@ -13,7 +13,6 @@ export default function doc(bot) {
 
     if (!subject) return bot.send(ask.to(message.chat.id)).then(onDoc);
 
-
     search(subject, count).then(results => {
       for (let result of results) {
         const msg = new Message().to(message.chat.id)
