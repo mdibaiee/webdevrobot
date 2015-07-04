@@ -25,9 +25,12 @@ export default function subscribe(bot) {
 
         let posts = [];
 
+        console.log(time.time);
+
         parser.on('data', function listener(post) {
-          console.log('Loading Data');
           const date = new Date(post.date);
+
+          console.log(date);
 
           if (date > time.time) {
             parser.removeListener('data', listener);
