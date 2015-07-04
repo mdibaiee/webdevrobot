@@ -6,7 +6,7 @@ import npm from './commands/npm';
 import github from './commands/github';
 
 let bot = new Bot({
-  token: '121143906:AAFJz_-Bjwq_8KQqTmyY2MtlcPb-bX_1O7M'
+  token: process.env.JAVASCRIPTBOT_TOKEN
 });
 
 bot.start();
