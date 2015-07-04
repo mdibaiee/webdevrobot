@@ -30,12 +30,9 @@ export default function subscribe(bot) {
         parser.on('data', function listener(post) {
           const date = new Date(post.date);
 
-          console.log(date);
-
           if (date < time) {
             parser.removeListener('data', listener);
 
-            console.log(new Date());
             write('time', {time: new Date()});
 
             resolve(posts);
