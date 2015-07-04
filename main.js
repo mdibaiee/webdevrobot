@@ -2,6 +2,8 @@ import Bot from 'telegram-api/build';
 import Message from 'telegram-api/types/Message';
 import subscribe from './commands/subscribe';
 import doc from './commands/doc';
+import npm from './commands/npm';
+import github from './commands/github';
 
 let bot = new Bot({
   token: '121143906:AAFJz_-Bjwq_8KQqTmyY2MtlcPb-bX_1O7M'
@@ -13,8 +15,8 @@ const COMMANDS = `Commands:
 /subscribe - Subscribe to /r/javascript and get a message for each new message
 /unsubscribe - Unsubscribe
 /doc [subject] - Search MDN for the given subject
-/github [subject] - Search GitHub for a repository
-/npm [subject] - Search NPM for a package`;
+/github [repository] - Search GitHub for a repository
+/npm [package] - Search NPM for a package`;
 
 const start = new Message().text(`Hello!
 I give you services to search across various sources such as MDN, GitHub, etc.
@@ -33,3 +35,5 @@ bot.command('help', message => {
 
 subscribe(bot);
 doc(bot);
+npm(bot);
+github(bot);
