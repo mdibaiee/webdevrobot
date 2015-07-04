@@ -17,14 +17,18 @@ export default function github(bot) {
           }
         }, (err, res, body) => {
           let result = JSON.parse(body);
-          result.items.length ? resolve([rep, result.items[0].html_url]) : reject();
+          if (result.items && result.items.length) {
+            resolve([rep, result.items[0].html_url]);
+          } else {
+            reject();
+          }
         });
       }).then((result) => {
-        bot.send(new Message().text(result[0] + '\n' + result[1]).to(id))
+        bot.send(new Message().text(result[0] + '\n' + result[1]).to(id));
       }).catch(() => {
         bot.send(new Message().text('No results found :(').to(id));
       });
-    }
+    };
 
     let rep = message.text.slice(7).trim();
 
