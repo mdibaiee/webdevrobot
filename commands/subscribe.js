@@ -55,7 +55,10 @@ export default function subscribe(bot) {
     }
   };
 
-  refresh().then(cb);
+  refresh().then(posts => {
+    console.log(posts);
+    cb(posts);
+  });
   setInterval(refresh.bind(null, cb), 1000 * 60 * 5);
 
   const success = new Message().text('You\'ve been successfuly subscribed!');
