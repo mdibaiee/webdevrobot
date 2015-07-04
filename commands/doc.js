@@ -1,83 +1,44 @@
 import Message from 'telegram-api/types/Message';
 import request from 'request';
-import search from '../utils/search';
-
-import {read, write} from '../utils/files';
 
 export default function doc(bot) {
-  let CACHE;
-  let TITLES;
-
-  const BASE = 'https://developer.mozilla.org';
-  const PREFIX = '/en-US/docs/Web/';
-  const SOURCES = ['HTML', 'CSS', 'JavaScript', 'API'];
-  const METHOD = '$children';
-
-  const refresh = () => {
-    CACHE = read('mdn');
-    TITLES = CACHE.map(page => page.title);
-
-    const promises = SOURCES.map(source => {
-      return new Promise((resolve, reject) => {
-        request(BASE + PREFIX + source + METHOD, (err, res, body) => {
-          if (err) {
-            reject(err);
-            return;
-          }
-
-          const json = JSON.parse(body);
-
-          const array = [];
-          json.subpages.forEach(function flatten(page) {
-            if (page.subpages) {
-              page.subpages.forEach(flatten);
-            }
-
-            delete page.subpages;
-            array.push(page);
-          });
-
-          resolve(array);
-        });
-      });
-    });
-
-    return Promise.all(promises).then(arrays => {
-      const array = arrays.reduce((a, b) => {
-        return a.concat(b);
-      }, []);
-
-      write('mdn', array);
-
-      CACHE = array;
-      TITLES = CACHE.map(page => page.title);
-
-      return array;
-    });
-  };
-  refresh().then(() => {
-    setInterval(refresh, 1000 * 60 * 60);
-  });
-
-  const getSubject = subject => {
-    const [index, string, relevance] = search(TITLES, subject)[0];
-    const page = CACHE[index];
-
-    if (relevance <= 1) return new Message().text('No results found :(');
-
-    return new Message().text(string + '\n' + BASE + page.url);
-  };
-
   const ask = new Message().text('What subject are you searching for?');
-  bot.command('doc', message => {
-    let subject = message.text.slice(4).trim();
 
-    if (!subject) {
-      bot.send(ask.to(message.chat.id)).then(answer => {
-        bot.send(getSubject(answer.text).to(message.chat.id));
-      });
-    } else {
-      bot.send(getSubject(subject).to(message.chat.id));
+  bot.command('doc', function onDoc(message) {
+    // arguments are in format %subject% +count
+    let [subject, count] = message.text.replace('/doc', '')
+                                       .match(/([^+]*)\+?(\d+)?/);
+    subject = subject.trim();
+    count = parseInt(count, 10);
+
+    if (!subject) return bot.send(ask.to(message.chat.id)).then(onDoc);
+
+
+    const results = search(subject, count);
+
+    for (let result of results) {
+      const msg = new Message().to(message.chat.id)
+                               .text(result.title + '\n' + result.url);
+      bot.send(msg);
     }
+  });
+}
+
+const BASE = 'https://developer.mozilla.org/en-US/search.json?q=';
+function search(subject, count = 1) {
+  return new Promise((resolve, reject) => {
+    request(BASE + encodeURIComponent(subject), (err, res, body) => {
+      if (err) {
+        reject(err);
+        return;
+      }
+
+      const json = JSON.parse(body);
+
+      const answer = json.documents.slice(0, count)
+                                   .map(d => ({title: d.title, url: d.url}));
+
+      resolve(answer);
+    });
   });
 }
