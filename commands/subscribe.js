@@ -9,9 +9,9 @@ import {read, write} from '../utils/files';
 export default function subscribe(bot) {
   const users = read('users');
   const feeds = read('feeds');
-  const time = read('time');
+  let {time} = read('time');
 
-  time.time = new Date(time.time);
+  time = new Date(time);
 
   const refresh = () => {
     return new Promise((resolve, reject) => {
@@ -32,9 +32,10 @@ export default function subscribe(bot) {
 
           console.log(date);
 
-          if (date < time.time) {
+          if (date < time) {
             parser.removeListener('data', listener);
 
+            console.log(new Date());
             write('time', {time: new Date()});
 
             resolve(posts);
