@@ -14,7 +14,9 @@ bot.start();
 const COMMANDS = `Commands:
 /subscribe - Subscribe to /r/javascript and get a message for each new message
 /unsubscribe - Unsubscribe
-/doc [subject] - Search MDN for the given subject
+/doc [subject] [+count] - Search MDN for the given subject, show |count| results
+  Example: /doc Event +3 – Searches for Event, shows top three results
+
 /github [repository] - Search GitHub for a repository
 /npm [package] - Search NPM for a package`;
 

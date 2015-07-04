@@ -6,21 +6,21 @@ export default function doc(bot) {
 
   bot.command('doc', function onDoc(message) {
     // arguments are in format %subject% +count
-    let [subject, count] = message.text.replace('/doc', '')
+    let [, subject, count] = message.text.replace('/doc', '')
                                        .match(/([^+]*)\+?(\d+)?/);
     subject = subject.trim();
-    count = parseInt(count, 10);
+    count = parseInt(count, 10) || 1;
 
     if (!subject) return bot.send(ask.to(message.chat.id)).then(onDoc);
 
 
-    const results = search(subject, count);
-
-    for (let result of results) {
-      const msg = new Message().to(message.chat.id)
-                               .text(result.title + '\n' + result.url);
-      bot.send(msg);
-    }
+    search(subject, count).then(results => {
+      for (let result of results) {
+        const msg = new Message().to(message.chat.id)
+                                 .text(result.title + '\n' + result.url);
+        bot.send(msg);
+      }
+    });
   });
 }
 
