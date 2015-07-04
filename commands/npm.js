@@ -8,23 +8,25 @@ export default function npm(bot) {
   const ask = new Message().text('What package are you searching for?');
   bot.command('npm', message => {
 
-    const search = (pack, id) => {
+    const search = (pkg, id) => {
       new Promise((resolve, reject) => {
         request(BASE + pack, (err, res, body) => {
           try {
             const result = JSON.parse(body);
-            resolve([pack, result.name])
-          }
-          catch(e) {
+            resolve(result.name);
+          } catch(e) {
             reject();
           }
         });
-      }).then((result) => {
-        bot.send(new Message().text(result[0] + '\n' + 'https://www.npmjs.com/' + result[1]).to(id))
+      }).then(result => {
+        const msg = new Message()
+                    .text(`${pkg}\nhttps://www.npmjs.com/${result}`)
+                    .to(id);
+        bot.send(msg);
       }).catch(() => {
         bot.send(new Message().text('No results found :(').to(id));
       });
-    }
+    };
 
     let pack = message.text.slice(4).trim();
 
