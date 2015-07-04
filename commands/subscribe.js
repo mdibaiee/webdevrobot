@@ -11,6 +11,8 @@ export default function subscribe(bot) {
   const feeds = read('feeds');
   const time = read('time');
 
+  time.time = new Date(time);
+
   const refresh = () => {
     return new Promise((resolve, reject) => {
       for (let feed of feeds) {
