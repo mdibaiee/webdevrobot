@@ -35,7 +35,6 @@ export default function subscribe(bot) {
 
             write('time', {time: new Date()});
 
-            console.log(posts);
             resolve(posts);
             return;
           }
@@ -55,10 +54,7 @@ export default function subscribe(bot) {
     }
   };
 
-  refresh().then(posts => {
-    console.log(posts);
-    cb(posts);
-  });
+  refresh().then(cb);
   setInterval(refresh.bind(null, cb), 1000 * 60 * 5);
 
   const success = new Message().text('You\'ve been successfuly subscribed!');
