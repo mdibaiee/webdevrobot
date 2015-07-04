@@ -11,33 +11,38 @@ export default function subscribe(bot) {
   const feeds = read('feeds');
   const time = read('time');
 
-  const refresh = (cb) => {
-    for (let feed of feeds) {
-      const req = request(feed.url);
-      req.setHeader('user-agent', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10)');
-      req.setHeader('accept', 'text/html,application/xhtml+xml');
+  const refresh = () => {
+    return new Promise((resolve, reject) => {
+      for (let feed of feeds) {
+        const req = request(feed.url);
+        req.setHeader('user-agent', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10)');
+        req.setHeader('accept', 'text/html,application/xhtml+xml');
 
-      const parser = new FeedParser();
+        const parser = new FeedParser();
 
-      req.on('response', res => res.pipe(parser));
+        req.on('response', res => res.pipe(parser));
+        req.on('error', reject);
 
-      let posts = [];
+        let posts = [];
 
-      parser.on('data', function listener(post) {
-        const date = new Date(post.date);
+        parser.on('data', function listener(post) {
+          console.log('Loading Data');
+          const date = new Date(post.date);
 
-        if (date > time.time) {
-          parser.removeListener('data', listener);
+          if (date > time.time) {
+            parser.removeListener('data', listener);
 
-          write('time', {time: new Date()});
+            write('time', {time: new Date()});
 
-          if (cb) cb(posts);
+            resolve(posts);
+            return;
+          }
+          posts.push(post);
+        });
 
-          return;
-        }
-        posts.push(post);
-      });
-    }
+        parser.on('error', reject);
+      }
+    });
   };
 
   const cb = function(posts) {
@@ -48,7 +53,7 @@ export default function subscribe(bot) {
     }
   };
 
-  refresh(cb);
+  refresh().then(cb);
   setInterval(refresh.bind(null, cb), 1000 * 60 * 5);
 
   const success = new Message().text('You\'ve been successfuly subscribed!');
