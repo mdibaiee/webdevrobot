@@ -51,8 +51,8 @@ export default function subscribe(bot) {
   };
 
   const cb = function(posts) {
+    console.log(users);
     for (let post of posts) {
-      console.log(users);
       const msg = new BulkMessage().text(post.title + '\n' + post.link)
                                    .to(users);
       bot.send(msg);
