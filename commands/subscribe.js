@@ -27,8 +27,11 @@ export default function subscribe(bot) {
 
         let posts = [];
 
+        console.log('Time', time);
         parser.on('data', function listener(post) {
           const date = new Date(post.date);
+
+          console.log(date);
 
           if (date < time) {
             parser.removeListener('data', listener);
@@ -39,7 +42,6 @@ export default function subscribe(bot) {
             resolve(posts);
             return;
           }
-          console.log(post.title);
           posts.push(post);
         });
 
