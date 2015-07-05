@@ -27,18 +27,15 @@ export default function subscribe(bot) {
 
         let posts = [];
 
-        console.log('Time', time);
         parser.on('data', function listener(post) {
           const date = new Date(post.date);
 
-          console.log(post.title);
           if (date < time) {
             parser.removeListener('data', listener);
 
             time = new Date();
             write('time', {time: time + ''});
 
-            console.log(posts);
             resolve(posts);
             return;
           }
@@ -60,7 +57,9 @@ export default function subscribe(bot) {
   };
 
   refresh().then(cb);
-  setInterval(refresh.bind(null, cb), 1000 * 60 * 5);
+  setInterval(() => {
+    refresh().then(cb);
+  }, 1000 * 60 * 5);
 
   const success = new Message().text('You\'ve been successfuly subscribed!');
   const duplicate = new Message().text('You are already subscribed!');
