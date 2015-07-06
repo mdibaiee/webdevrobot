@@ -1,6 +1,6 @@
 import bot from '../bot';
 import Message from 'telegram-api/types/Message';
-import request from 'request';
+import unirest from 'unirest';
 
 const BASE = 'http://registry.npmjs.org/';
 
@@ -20,16 +20,13 @@ bot.command('npm <pkg>', message => {
 
 function search(pkg) {
   return new Promise((resolve, reject) => {
-    request(BASE + pkg, (err, res, body) => {
-      try {
-        const result = JSON.parse(body);
-        resolve({
-          name: pkg,
-          url: `https://npmjs.com/${result.name}`
-        });
-      } catch(e) {
-        reject();
-      }
+    unirest.get(BASE + pkg).end(({body}) => {
+      if (!body) return reject();
+
+      resolve({
+        name: body.name,
+        url: `https://npmjs.com/${body.name}`
+      });
     });
   });
 }

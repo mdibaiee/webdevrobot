@@ -1,6 +1,6 @@
 import bot from '../bot';
 import Message from 'telegram-api/types/Message';
-import request from 'request';
+import unirest from 'unirest';
 
 bot.command('mdn <subject> [+count]', message => {
   const {subject, count} = message.args;
@@ -22,20 +22,14 @@ bot.command('mdn <subject> [+count]', message => {
 const BASE = 'https://developer.mozilla.org/en-US/search.json?q=';
 function search(subject, count = 1) {
   return new Promise((resolve, reject) => {
-    request(BASE + encodeURIComponent(subject), (err, res, body) => {
-      if (err) {
-        reject(err);
-        return;
-      }
+    unirest.get(BASE + encodeURIComponent(subject)).end(({body}) => {
 
-      const json = JSON.parse(body);
-
-      if (!json.documents.length) {
+      if (!body.documents.length) {
         reject();
       }
 
-      const items = json.documents.slice(0, count)
-                                   .map(d => ({title: d.title, url: d.url}));
+      const items = body.documents.slice(0, count)
+                                  .map(d => ({title: d.title, url: d.url}));
 
       resolve(items);
     });

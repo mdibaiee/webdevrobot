@@ -1,6 +1,5 @@
 import bot from '../bot';
 import Message from 'telegram-api/types/Message';
-import request from 'request';
 import unirest from 'unirest';
 
 bot.command('github <query> [+count]', message => {
