@@ -1,5 +1,42 @@
 [
   {
+    "id": "Reddit /r/javascript",
     "url": "https://www.reddit.com/r/javascript/new/.rss"
+  },
+  {
+    "id": "Reddit /r/css",
+    "url": "https://www.reddit.com/r/css/new/.rss"
+  },
+  {
+    "id": "DailyJS",
+    "url": "http://dailyjs.com/rss/"
+  },
+  {
+    "id": "2ality",
+    "url": "http://feeds.feedburner.com/2ality?format=xml"
+  },
+  {
+    "id": "Mozilla Hacks",
+    "url": "https://hacks.mozilla.org/feed/"
+  },
+  {
+    "id": "JS Rocks",
+    "url": "http://jsrocks.org/rss"
+  },
+  {
+    "id": "Codrops",
+    "url": "http://tympanus.net/codrops/rss"
+  },
+  {
+    "id": "CSS-Tricks",
+    "url": "http://css-tricks.com/rss"
+  },
+  {
+    "id": "Sitepoint",
+    "url": "http://www.sitepoint.com/feed/"
+  },
+  {
+    "id": "Tuts+ Web Development",
+    "url": "http://code.tutsplus.com/categories/web-development.atom"
   }
 ]

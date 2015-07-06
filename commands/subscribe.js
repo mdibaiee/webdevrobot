@@ -1,90 +1,81 @@
+import bot from '../bot';
+import fetch from '../utils/fetch-feeds';
+import {read, write} from '../utils/files';
 import BulkMessage from 'telegram-api/types/BulkMessage';
 import Message from 'telegram-api/types/Message';
+import Question from 'telegram-api/types/Question';
+import Keyboard from 'telegram-api/types/Keyboard';
 
-import FeedParser from 'feedparser';
-import request from 'request';
+const USERS = read('users');
+const FEEDS = read('feeds');
 
-import {read, write} from '../utils/files';
+for (let feed of FEEDS) {
+  if (!USERS[feed.id]) USERS[feed.id] = [];
+}
 
-export default function subscribe(bot) {
-  const users = read('users');
-  const feeds = read('feeds');
-  let {time} = read('time');
+const INTERVAL = 1000 * 60 * 2;
 
-  time = new Date(time);
+// Messages
+const hideKeyboard = new Keyboard().hide();
+const alreadySubscribed = new Message().text('You are already subscribed')
+                                       .keyboard(hideKeyboard);
+const success = new Message().text('You\'ve been successfuly subscribed!')
+                             .keyboard(hideKeyboard);
 
-  const refresh = () => {
-    return new Promise((resolve, reject) => {
-      for (let feed of feeds) {
-        const req = request(feed.url);
-        req.setHeader('user-agent', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10)');
-        req.setHeader('accept', 'text/html,application/xhtml+xml');
+const keys = FEEDS.map(feed => {
+  return [feed.id];
+});
+const noFeed = new Question().text('What feed do you want to subscribe to?')
+                             .answers(keys);
 
-        const parser = new FeedParser();
+// Command
+bot.command('subscribe <feed>', message => {
+  const feed = message.args.feed;
 
-        req.on('response', res => res.pipe(parser));
-        req.on('error', reject);
-
-        let posts = [];
-
-        parser.on('data', function listener(post) {
-          const date = new Date(post.date);
-
-          if (date < time) {
-            parser.removeListener('data', listener);
-
-            time = new Date();
-            write('time', {time: time + ''});
-
-            resolve(posts);
-            return;
-          }
-          posts.push(post);
-        });
-
-        parser.on('error', reject);
-      }
+  if (!feed) {
+    bot.send(noFeed.to(message.chat.id).reply(message.message_id))
+    .then(answer => {
+      subscribe(message.chat.id, answer.text);
     });
-  };
+  } else {
+    subscribe(message.chat.id, feed);
+  }
+});
 
-  const cb = function(posts) {
-    console.log(users);
+function subscribe(id, feed) {
+  const users = USERS[feed];
+
+  if (users.indexOf(id) > -1) {
+    const msg = alreadySubscribed.to(id);
+    bot.send(msg);
+
+    return;
+  }
+
+  users.push(id);
+  write('users', USERS);
+
+  const msg = success.to(id);
+  bot.send(msg);
+}
+
+const cb = function(answers) {
+  for (let {feed, posts} of answers) {
+    const users = USERS[feed.id];
     for (let post of posts) {
       const msg = new BulkMessage().text(post.title + '\n' + post.link)
                                    .to(users);
       bot.send(msg);
     }
-  };
+  }
+};
 
-  refresh().then(cb);
-  setInterval(() => {
-    refresh().then(cb);
-  }, 1000 * 60 * 5);
+fetch().then(cb);
+setInterval(() => {
+  fetch().then(cb);
+}, INTERVAL);
 
-  const success = new Message().text('You\'ve been successfuly subscribed!');
-  const duplicate = new Message().text('You are already subscribed!');
-  bot.command('subscribe', message => {
-    if (users.indexOf(message.chat.id) > -1) {
-      bot.send(duplicate.to(message.chat.id));
-      return;
-    }
-
-    users.push(message.chat.id);
-    write('users', users);
-
-    bot.send(success.to(message.chat.id));
-  });
-
-  const no = new Message().text('You are not subscribed at all!');
-  const unsubscribed = new Message().text('You\'ve been unsubscribed.');
-  bot.command('unsubscribe', message => {
-    const index = users.indexOf(message.chat.id);
-    if (index === -1) {
-      bot.send(no.to(message.chat.id));
-    } else {
-      users.splice(index, 1);
-      write('users', users);
-      bot.send(unsubscribed.to(message.chat.id));
-    }
-  });
-}
+export default {
+  syntax: '/subscribe <feed>',
+  help: 'Subscribe to RSS feeds! See the list of /feeds'
+};
