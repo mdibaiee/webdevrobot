@@ -26,6 +26,7 @@ const noFeed = new Question().text('What feed do you want to subscribe to?')
 // Command
 bot.command('subscribe <feed>', message => {
   const feed = message.args.feed;
+  console.log(feed);
 
   if (!feed) {
     bot.send(noFeed.to(message.chat.id).reply(message.message_id))
@@ -41,6 +42,8 @@ function subscribe(id, feed) {
   USERS = read('users');
 
   const users = USERS[feed];
+
+  if (!users) return;
 
   if (users.indexOf(id) > -1) {
     const msg = new Message().text(`Already subscribed to ${feed}`).to(id)

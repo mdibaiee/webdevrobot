@@ -3,6 +3,8 @@ import Message from 'telegram-api/types/Message';
 import unirest from 'unirest';
 
 bot.command('github <query> [+count]', message => {
+  if (!message.args.query) return;
+
   search(message.args.query, message.args.count).then(items => {
     for (let {name, url} of items) {
       const msg = new Message().text(`${name}\n${url}`).to(message.chat.id);
