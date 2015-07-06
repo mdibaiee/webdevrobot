@@ -1,16 +1,13 @@
 import bot from '../bot';
 import Message from 'telegram-api/types/Message';
-import unirest from 'unirest';
+import search from 'enpeem-search';
 
-const BASE = 'http://registry.npmjs.org/';
-
-bot.command('npm <pkg>', message => {
-  let pkg = message.args.pkg;
-
-  search(pkg).then(item => {
-    const msg = new Message().text(`${item.name}\n${item.url}`)
-                             .to(message.chat.id);
-    bot.send(msg);
+bot.command('npm <pkg> [+count]', message => {
+  search(message.args.pkg, message.args.count).then(items => {
+    for (let {name, url} of items) {
+      const msg = new Message().text(`${name}\n${url}`).to(message.chat.id);
+      bot.send(msg);
+    }
   }, () => {
     const msg = new Message().text('No results found :(').to(message.chat.id);
 
@@ -18,20 +15,7 @@ bot.command('npm <pkg>', message => {
   });
 });
 
-function search(pkg) {
-  return new Promise((resolve, reject) => {
-    unirest.get(BASE + pkg).end(({body}) => {
-      if (!body) return reject();
-
-      resolve({
-        name: body.name,
-        url: `https://npmjs.com/${body.name}`
-      });
-    });
-  });
-}
-
 export default {
-  syntax: '/npm <pkg>',
+  syntax: '/npm <pkg> [+count]',
   help: 'Search npm for the given package'
 };
