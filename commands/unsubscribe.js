@@ -4,16 +4,11 @@ import Question from 'telegram-api/types/Question';
 import Keyboard from 'telegram-api/types/Keyboard';
 import {read, write} from '../utils/files';
 
-const USERS = read('users');
+let USERS = read('users');
 
 // Messages
 const hideKeyboard = new Keyboard().hide();
-const no = new Message().text('You are not subscribed at all!')
-                        .keyboard(hideKeyboard);
-const unsubscribed = new Message().text('You\'ve been unsubscribed.')
-                                  .keyboard(hideKeyboard);
-const noFeed = new Question()
-                            .text('What feed do you want to unsubscribe from?');
+const noFeed = new Question().text('Select a feed to unsubscribe from');
 
 // Command
 bot.command('unsubscribe <feed>', message => {
@@ -23,9 +18,9 @@ bot.command('unsubscribe <feed>', message => {
     unsubscribe(message.chat.id, feed);
   } else {
     const keys = [];
-    for (let list of Object.keys(users)) {
-      if (users[list].indexOf(message.chat.id) > -1) {
-        subscribed.push([feed]);
+    for (let list of Object.keys(USERS)) {
+      if (USERS[list].indexOf(message.chat.id) > -1) {
+        keys.push([list]);
       }
     }
     bot.send(noFeed.answers(keys).to(message.chat.id).reply(message.message_id))
@@ -36,22 +31,28 @@ bot.command('unsubscribe <feed>', message => {
 });
 
 function unsubscribe(id, feed) {
+  USERS = read('users');
+
   const users = USERS[feed];
 
   const index = users.indexOf(id);
   if (index === -1) {
-    bot.send(no.to(id));
+    const msg = new Message().text(`You are not subscribed to ${feed}`).to(id)
+                             .keyboard(hideKeyboard);
+    bot.send(msg);
   } else {
     users.splice(index, 1);
 
     write('users', USERS);
 
-    bot.send(unsubscribed.to(id));
+    const msg = new Message().text(`Unsubscribed from ${feed}`).to(id)
+                             .keyboard(hideKeyboard);
+    bot.send(msg);
   }
 }
 
 
 export default {
-  syntax: '/unsubscribe <feed>',
+  syntax: '/unsubscribe [feed]',
   help: 'Unsubscribe from feeds'
 };

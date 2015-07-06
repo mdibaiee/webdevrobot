@@ -6,8 +6,8 @@ import Message from 'telegram-api/types/Message';
 import Question from 'telegram-api/types/Question';
 import Keyboard from 'telegram-api/types/Keyboard';
 
-const USERS = read('users');
-const FEEDS = read('feeds');
+let USERS = read('users');
+let FEEDS = read('feeds');
 
 for (let feed of FEEDS) {
   if (!USERS[feed.id]) USERS[feed.id] = [];
@@ -17,11 +17,6 @@ const INTERVAL = 1000 * 60 * 2;
 
 // Messages
 const hideKeyboard = new Keyboard().hide();
-const alreadySubscribed = new Message().text('You are already subscribed')
-                                       .keyboard(hideKeyboard);
-const success = new Message().text('You\'ve been successfuly subscribed!')
-                             .keyboard(hideKeyboard);
-
 const keys = FEEDS.map(feed => {
   return [feed.id];
 });
@@ -43,10 +38,13 @@ bot.command('subscribe <feed>', message => {
 });
 
 function subscribe(id, feed) {
+  USERS = read('users');
+
   const users = USERS[feed];
 
   if (users.indexOf(id) > -1) {
-    const msg = alreadySubscribed.to(id);
+    const msg = new Message().text(`Already subscribed to ${feed}`).to(id)
+                             .keyboard(hideKeyboard);
     bot.send(msg);
 
     return;
@@ -55,7 +53,8 @@ function subscribe(id, feed) {
   users.push(id);
   write('users', USERS);
 
-  const msg = success.to(id);
+  const msg = new Message().text(`Subscribed to ${feed}`).to(id)
+                           .keyboard(hideKeyboard);
   bot.send(msg);
 }
 
@@ -76,6 +75,6 @@ setInterval(() => {
 }, INTERVAL);
 
 export default {
-  syntax: '/subscribe <feed>',
+  syntax: '/subscribe [feed]',
   help: 'Subscribe to RSS feeds! See the list of /feeds'
 };
