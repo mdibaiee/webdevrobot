@@ -8,10 +8,9 @@ let USERS = read('users');
 
 // Messages
 const hideKeyboard = new Keyboard().hide();
-const noFeed = new Question().text('Select a feed to unsubscribe from');
 
 // Command
-bot.command('unsubscribe <feed>', message => {
+bot.command('unsubscribe ...feed', message => {
   const feed = message.args.feed;
 
   if (feed) {
@@ -23,8 +22,10 @@ bot.command('unsubscribe <feed>', message => {
         keys.push([list]);
       }
     }
-    bot.send(noFeed.answers(keys).to(message.chat.id).reply(message.message_id))
-    .then(answer => {
+    const msg = new Question().text('Select a feed to unsubscribe from')
+                              .answers(keys).to(message.chat.id)
+                              .reply(message.message_id);
+    bot.send(msg).then(answer => {
       unsubscribe(message.chat.id, answer.text);
     });
   }

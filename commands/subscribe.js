@@ -24,7 +24,7 @@ const noFeed = new Question().text('What feed do you want to subscribe to?')
                              .answers(keys);
 
 // Command
-bot.command('subscribe <feed>', message => {
+bot.command('subscribe ...feed', message => {
   const feed = message.args.feed;
   console.log(feed);
 
