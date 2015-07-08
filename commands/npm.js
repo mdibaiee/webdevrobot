@@ -1,6 +1,6 @@
-import bot from '../bot';
-import Message from 'telegram-api/types/Message';
-import search from 'enpeem-search';
+import search from 'enpeem-search'
+import Message from 'telegram-api/types/Message'
+import bot from '../bot'
 
 bot.command('npm <pkg> [+count]', message => {
   if (!message.args.pkg) return;

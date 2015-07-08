@@ -1,5 +1,6 @@
 import FeedParser from 'feedparser';
 import request from 'request';
+import unirest from 'unirest';
 import {read, write} from '../utils/files';
 
 const FEEDS = read('feeds');
@@ -26,9 +27,6 @@ export default function refresh() {
         if (date < time) {
           parser.removeListener('data', listener);
 
-          time = new Date();
-          write('time', {time: time + ''});
-
           resolve({feed, posts});
           return;
         }
@@ -39,5 +37,12 @@ export default function refresh() {
     });
   });
 
-  return Promise.all(promises);
+  const all = Promise.all(promises);
+  all.then(() => {
+    console.log('all');
+    time = new Date();
+    write('time', {time: time + ''});
+  });
+
+  return all;
 }
