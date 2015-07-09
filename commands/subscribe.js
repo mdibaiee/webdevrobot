@@ -26,7 +26,6 @@ const noFeed = new Question().text('What feed do you want to subscribe to?')
 // Command
 bot.command('subscribe ...feed', message => {
   const feed = message.args.feed;
-  console.log(feed);
 
   if (!feed) {
     bot.send(noFeed.to(message.chat.id).reply(message.message_id))

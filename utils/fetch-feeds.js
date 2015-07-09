@@ -39,7 +39,6 @@ export default function refresh() {
 
   const all = Promise.all(promises);
   all.then(() => {
-    console.log('all');
     time = new Date();
     write('time', {time: time + ''});
   });
