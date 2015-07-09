@@ -2,10 +2,10 @@ import bot from '../bot';
 import Message from 'telegram-api/types/Message';
 import unirest from 'unirest';
 
-bot.command('github <query> [+count]', message => {
-  if (!message.args.query) return;
+bot.command('github <repository> [+count]', message => {
+  if (!message.args.repository) return;
 
-  search(message.args.query, message.args.count).then(items => {
+  search(message.args.repository, message.args.count).then(items => {
     for (let {name, url} of items) {
       const msg = new Message().text(`${name}\n${url}`).to(message.chat.id);
       bot.send(msg);

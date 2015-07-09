@@ -2,9 +2,9 @@ import search from 'enpeem-search'
 import Message from 'telegram-api/types/Message'
 import bot from '../bot'
 
-bot.command('npm <pkg> [+count]', message => {
-  if (!message.args.pkg) return;
-  search(message.args.pkg, message.args.count).then(items => {
+bot.command('npm <package> [+count]', message => {
+  if (!message.args.package) return;
+  search(message.args.package, message.args.count).then(items => {
     for (let {name, url} of items) {
       const msg = new Message().text(`${name}\n${url}`).to(message.chat.id);
       bot.send(msg);
